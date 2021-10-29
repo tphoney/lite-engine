@@ -10,6 +10,8 @@ import (
 	"encoding/pem"
 	"math/big"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -56,16 +58,26 @@ func GenerateCert(host string, ca *Certificate) (*Certificate, error) {
 	}
 
 	certOut := new(bytes.Buffer)
-	pem.Encode(certOut, &pem.Block{
+	certOutErr := pem.Encode(certOut, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: derBytes,
 	})
+	if certOutErr != nil {
+		logrus.
+			WithError(certOutErr).
+			Errorln("cannot pem encode certOut")
+	}
 
 	keyOut := new(bytes.Buffer)
-	pem.Encode(keyOut, &pem.Block{
+	keyOutErr := pem.Encode(keyOut, &pem.Block{
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(priv),
 	})
+	if keyOutErr != nil {
+		logrus.
+			WithError(keyOutErr).
+			Errorln("cannot pem encode keyout")
+	}
 
 	return &Certificate{
 		Cert: certOut.Bytes(),
@@ -97,17 +109,25 @@ func GenerateCA() (*Certificate, error) {
 	}
 
 	certOut := new(bytes.Buffer)
-	pem.Encode(certOut, &pem.Block{
+	certOutErr := pem.Encode(certOut, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: derBytes,
 	})
-
+	if certOutErr != nil {
+		logrus.
+			WithError(certOutErr).
+			Errorln("cannot pem encode certOut")
+	}
 	keyOut := new(bytes.Buffer)
-	pem.Encode(keyOut, &pem.Block{
+	keyOutErr := pem.Encode(keyOut, &pem.Block{
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(priv),
 	})
-
+	if keyOutErr != nil {
+		logrus.
+			WithError(keyOutErr).
+			Errorln("cannot pem encode keyout")
+	}
 	return &Certificate{
 		Cert: certOut.Bytes(),
 		Key:  keyOut.Bytes(),

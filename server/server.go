@@ -49,7 +49,7 @@ func (s Server) Start(ctx context.Context) error {
 	})
 	g.Go(func() error {
 		<-ctx.Done()
-		srv.Shutdown(ctx)
+		srv.Shutdown(ctx) // nolint: errcheck
 		return nil
 	})
 	return g.Wait()

@@ -1,0 +1,32 @@
+kind: pipeline
+type: docker
+name: unit tests
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: go vet and unit tests
+    image: golang:1.17
+    commands:
+      - go vet ./...
+      - go test -cover ./...
+    volumes:
+      - name: cache
+        path: /go
+    depends_on:
+      - clone
+  - name: golangci-lint
+    image: golangci/golangci-lint
+    commands:
+      - golangci-lint run --timeout 300s
+    volumes:
+      - name: cache
+        path: /go
+    depends_on:
+      - clone
+
+volumes:
+  - name: cache
+    temp: {}

@@ -28,7 +28,12 @@ func Handler(config config.Config) http.Handler {
 
 	// Liveness check
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "OK")
+		_, writeErr := io.WriteString(w, "OK")
+		if writeErr != nil {
+			logger.FromRequest(r).
+				WithError(writeErr).
+				Errorln("cannot write healthz response")
+		}
 	})
 
 	return r
